@@ -7,6 +7,7 @@ import database.RoomStatEnum;
 import global.GlobalData;
 
 public class HotelMain {
+	// read ì„œì—°
 	public static void main(String[] args) {
 //		GlobalData.roomList[0][0] = new NormalRoom(101, RoomStatEnum.AVAILABLE);
 //		GlobalData.roomList[0][1] = new NormalRoom(102, RoomStatEnum.AVAILABLE);
@@ -21,13 +22,13 @@ public class HotelMain {
 //		GlobalData.roomList[2][2] = new NormalRoom(303, RoomStatEnum.AVAILABLE);
 //		GlobalData.roomList[2][3] = new NormalRoom(304, RoomStatEnum.CLEANING);
 //		
-//		Customer customer = new Customer("ºô°ÔÀÌÃ÷", 2, "02-987-6543");
+//		Customer customer = new Customer("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 2, "02-987-6543");
 //		GlobalData.roomList[0][2].setCustomer(customer);
-//		customer = new Customer("½ºÆ¼ºêÀâ½º", 1, "010-7777-7777");
+//		customer = new Customer("ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½â½º", 1, "010-7777-7777");
 //		GlobalData.roomList[1][2].setCustomer(customer);
-//		customer = new Customer("¿ö·£¹öÇÍ", 3, "011-111-1234");
+//		customer = new Customer("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", 3, "011-111-1234");
 //		GlobalData.roomList[1][3].setCustomer(customer);
-//		customer = new Customer("¹Ú¼º¹«", 3, "8210-999-1111");
+//		customer = new Customer("ï¿½Ú¼ï¿½ï¿½ï¿½", 3, "8210-999-1111");
 //		GlobalData.roomList[2][0].setCustomer(customer);
 		
 		HotelController controller = HotelController.getInstance();	
