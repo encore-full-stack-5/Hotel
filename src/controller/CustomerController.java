@@ -33,17 +33,23 @@ public class CustomerController {
 
 	public void start() {
 		while (true) {
-			System.out.println("원하시는 메뉴를 선택하세요 \n1.객실 예약하기 2. 예약 객실 취소하기 3. 방 정보 열람하기");
-			choose = Integer.parseInt(sc.nextLine());
-			if (choose == 1) {
-				bookRoom();
-			} else if (choose == 2) {
-				bookCancel();
-			} else if (choose == 3) {
-				printRoomInfo();
-			} else {
+			try {
+				System.out.println("원하시는 메뉴를 선택하세요 \n1.객실 예약하기 2. 예약 객실 취소하기 3. 방 정보 열람하기");
+				choose = Integer.parseInt(sc.nextLine());
+				if (choose == 1) {
+					bookRoom();
+				} else if (choose == 2) {
+					bookCancel();
+				} else if (choose == 3) {
+					printRoomInfo();
+				} else {
+					System.out.println("잘못된 번호입니다. 다시 입력하세요 \n");
+				}
+			} catch (NumberFormatException e) {
+				// TODO: handle exception
 				System.out.println("잘못된 번호입니다. 다시 입력하세요 \n");
 			}
+			
 
 		}
 	}
@@ -71,7 +77,7 @@ public class CustomerController {
 				System.out.println(customerService.roomTypeIsAvailable(1));
 				System.out.println("1. 예약하기 2. 뒤로가기");
 				choose = Integer.parseInt(sc.nextLine());
-				sc.nextLine();
+				//sc.nextLine();
 				// 1번 선택
 				if (choose == 1)
 					bookPerson(1);
@@ -84,7 +90,7 @@ public class CustomerController {
 				System.out.println(customerService.roomTypeIsAvailable(2));
 				System.out.println("1. 예약하기 2. 뒤로가기");
 				choose = Integer.parseInt(sc.nextLine());
-				sc.nextLine();
+				//sc.nextLine();
 				// 1번 선택
 				if (choose == 1)
 					bookPerson(2);
