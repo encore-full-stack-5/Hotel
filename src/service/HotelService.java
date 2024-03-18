@@ -136,7 +136,7 @@ public class HotelService {
 		if(room == RoomStatEnum.STAYING) {
 			dao.setRoomStat(Integer.parseInt(roomNum), 4);
 //			GlobalData.roomList[i][j].setStat(RoomStatEnum.CLEANING);
-			System.out.println("Ã¼Å© ¾Æ¿ô µÆ½À´Ï´Ù.");
+			System.out.println("Ã¼Å© ¾Æ¿ô µÆ½À´Ï´Ù. ¾È³çÈ÷ °¡½Ê½Ã¿À.");
 //			GlobalData.roomList[i][j].setCleanTime(LocalDateTime.now());
 			roomState();
 		} else if(room == RoomStatEnum.AVAILABLE)
