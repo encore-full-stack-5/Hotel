@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBInit {
-	private static final String URL = "jdbc:mysql://localhost:3306/hotel";
+	private static final String URL = "jdbc:mysql://192.168.80.14:3306/hotel";
 	private static final String USER = "hotel";
 	private static final String PW = "1234";
 	

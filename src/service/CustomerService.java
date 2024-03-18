@@ -6,6 +6,8 @@ import java.util.List;
 import dao.MainDao;
 import database.Customer;
 import database.HotelRoom;
+import database.NormalRoom;
+import database.RoomStatEnum;
 
 public class CustomerService {
 	private static MainDao mainDao;
@@ -29,16 +31,12 @@ public class CustomerService {
 	 * 즉, roomType은 GlobalData.roomList의 첫번째 차원 인덱스입니다.
 	 */
 	public int roomTypeIsAvailable(int roomType) {
-//		for(int i=0; i<4; i++) {
-//			if(GlobalData.roomList[roomType][i].getStat().getCode() == 1) {
-//				num++;
-//			}
-//		}
 		List<HotelRoom> rooms = mainDao.getAllRoomInfo();
 		int num=0;
 		for(HotelRoom room : rooms) {
-			if(room.getStat().getCode() == 1)
-				num++;
+			if (room.getRoomNum()/100 == roomType+1)
+				if(room.getStat().getCode() == 1)
+					num++;
 		}
 		return num;
 	}
@@ -55,15 +53,16 @@ public class CustomerService {
 	 * 즉, roomType은 GlobalData.roomList의 첫번째 차원 인덱스입니다.
 	 */
 	public void bookingRoom(int roomType, Customer customer) {
-//		int roomNum;
-//		for(roomNum=0; roomNum<4; roomNum++) {
-//			if(GlobalData.roomList[roomType][roomNum].getStat().getCode() == 1) {
-//				break;
-//			}
-//		}
-//		GlobalData.roomList[roomType][roomNum].setCustomer(customer);
-//		GlobalData.roomList[roomType][roomNum].setStat(RoomStatEnum.BOOKING);
-//		// DAO호출해서 파일 갱신
+		List<HotelRoom> rooms = mainDao.getAllRoomInfo();
+		for(HotelRoom room : rooms) {
+			if (room.getRoomNum()/100 == roomType+1)
+				if(room.getStat().getCode() == 1){
+					room.setCustomer(customer);
+					mainDao.setBooking(room);
+					mainDao.setRoomStat(room.getRoomNum(), RoomStatEnum.BOOKING.getCode());
+					return;
+				}
+		}
 	}
 	
 	/** 입력한 전화번호로 예약된 모든 방의 번호를 반환합니다.
@@ -73,21 +72,11 @@ public class CustomerService {
 	 */
 	public List<Integer> getBokingRoomByPhone(String phone) {
 		List<Integer> result = new ArrayList<>();
-//		for(HotelRoom[] room1 : GlobalData.roomList) {
-//			for(HotelRoom room2 : room1) {
-//				if(room2.getCustomer() != null) {
-//					if (phone.equals(room2.getCustomer().getPhone())) {
-//						result.add(room2.getRoomNum());
-//					}
-//				}
-//			}
-//		}
 		List<HotelRoom> rooms = mainDao.getAllRoomInfo();
 		for(HotelRoom room : rooms) {
-			if(room.getCustomer() != null && room.getCustomer().getPhone() == phone)
+			if(room.getCustomer() != null && room.getCustomer().getPhone().equals(phone))
 				result.add(Integer.parseInt(room.getCustomer().getPhone()));
 		}
-		
 		return result;
 	}
 	
