@@ -42,7 +42,7 @@ public class MainDao {
 		String sql = "select * from room_info";
 		try {
 			PreparedStatement ps = c.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				String roomNum = rs.getString("room_num");
 				int stat = rs.getInt("room_state");
@@ -51,19 +51,19 @@ public class MainDao {
 				switch (roomNum.charAt(0)) {
 				case '1':
 					room = new NormalRoom(Integer.parseInt(roomNum), RoomStatEnum.intToStatu(stat));
-					if(stat == 2 && bookingInfo > 0)
+					if (stat == 2 && bookingInfo > 0)
 						room.setCustomer(getCustomer(bookingInfo));
 					rooms.add(room);
 					break;
 				case '2':
 					room = new SuiteRoom(Integer.parseInt(roomNum), RoomStatEnum.intToStatu(stat));
-					if(stat == 2 && bookingInfo > 0)
+					if (stat == 2 && bookingInfo > 0)
 						room.setCustomer(getCustomer(bookingInfo));
 					rooms.add(room);
 					break;
 				case '3':
 					room = new LuxuryRoom(Integer.parseInt(roomNum), RoomStatEnum.intToStatu(stat));
-					if(stat == 2 && bookingInfo > 0)
+					if (stat == 2 && bookingInfo > 0)
 						room.setCustomer(getCustomer(bookingInfo));
 					rooms.add(room);
 					break;
@@ -71,20 +71,10 @@ public class MainDao {
 					break;
 				}
 			}
-//			for (int i = 0; i < rooms.size(); i++) {
-//				// roomList는 크기가 3*4인 2차원 배열, rooms는 길이가 12인 1차원 리스트
-//				GlobalData.roomList[i / 4][i % 4] = rooms.get(i);
-//			}
 			return rooms;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-//			try {
-//				c.rollback();
-//			} catch (SQLException e1) {
-//				e1.printStackTrace();
-//				System.out.println("Rollback Error");
-//			}
 		}
 		return null;
 	}
@@ -96,14 +86,12 @@ public class MainDao {
 	 * @return Customer 정보 반환, 일치하는 id가 없으면 Null 반환
 	 */
 	public Customer getCustomer(int id) {
-		String sql = "select * from customer where id = " + id;
+		String sql = "select * from customer where id = ?";
 
 		try {
-			c.setAutoCommit(false);
 			PreparedStatement ps = c.prepareStatement(sql);
-//			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery(sql);
-//			System.out.println(rs.getRow());
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			Customer customer = null;
 			while (rs.next()) {
 				String name = rs.getString("customer_name");
@@ -115,12 +103,6 @@ public class MainDao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			try {
-				c.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-				System.out.println("Rollback Error");
-			}
 		}
 		return null;
 
@@ -138,30 +120,37 @@ public class MainDao {
 			ps.setString(1, customer.getName());
 			ps.setInt(2, customer.getMember());
 			ps.setString(3, customer.getPhone());
-			
+
 			int updateCount = ps.executeUpdate(); // int 리턴
-			if(updateCount != 1) c.rollback();
-			else c.commit();
-			
+			if (updateCount != 1) {
+				c.rollback();}
+			else {
+				c.commit();}
+
 			sql = "select id from customer order by id desc limit 1;";
-			
+
 			ps = c.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery(sql);
 			while (rs.next()) {
+				System.out.println("2");
 				c_id = rs.getInt("id");
 			}
-			
+
 			sql = "update room_info set booking_info = ? where room_num = ?;";
-			
+
 			ps = c.prepareStatement(sql);
 			ps.setInt(1, c_id);
-			ps.setString(2, room.getRoomNum()+"");
-			
+			ps.setString(2, room.getRoomNum() + "");
+
 			updateCount = ps.executeUpdate(); // int 리턴
-			if(updateCount != 1) c.rollback();
-			else c.commit();
-			
-		}catch (Exception e) {
+			if (updateCount != 1) {
+				System.out.println("33");
+				c.rollback();}
+			else {
+				System.out.println("3");
+				c.commit();}
+
+		} catch (Exception e) {
 			try {
 				c.rollback();
 			} catch (SQLException e1) {
@@ -171,73 +160,79 @@ public class MainDao {
 			}
 		}
 	}
-	
+
 	/**
 	 * 룸정보에 고객정보 삭제하고, 해당 고객정보도 삭제
+	 * 
 	 * @param roomNum - 지울 호텔룸 방번호
 	 */
 	public void delBooking(int roomNum) {
 		String sql = "delete c.* from customer as c join (select * from room_info where room_num = ?) as r where r.booking_info = c.id;";
 
-			PreparedStatement ps;
+		PreparedStatement ps;
+		try {
+			c.setAutoCommit(false);
+			ps = c.prepareStatement(sql);
+			ps.setInt(1, roomNum);
+			int rs = ps.executeUpdate();
+			if (rs != 1)
+				c.rollback();
+			else
+				c.commit();
+
+			sql = "update room_info set booking_info = null, room_state = 4 where room_num = ?;";
+
+			ps = c.prepareStatement(sql);
+			ps.setInt(1, roomNum);
+			rs = ps.executeUpdate();
+			if (rs != 1)
+				c.rollback();
+			else
+				c.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			try {
-				ps = c.prepareStatement(sql);
-				ps.setInt(1, roomNum);
-				int rs = ps.executeUpdate();
-				if (rs != 1)
-					c.rollback();
-				else
-					c.commit();
-				
-				sql = "update room_info set booking_info = null, room_state = 4 where room_num = ?;";
-				
-				ps = c.prepareStatement(sql);
-				ps.setInt(1, roomNum);
-				rs = ps.executeUpdate();
-				if (rs != 1)
-					c.rollback();
-				else
-					c.commit();
-			} catch (SQLException e) {
+				c.rollback();
+			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
-				try {
-					c.rollback();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					System.out.println("Rollback Error");
-				}
+				e1.printStackTrace();
+				System.out.println("Rollback Error");
 			}
+		}
 	}
-	
+
 	/**
 	 * 호텔룸의 상태 변경
+	 * 
 	 * @param roomNum - 변경할 호텔룸 방번호
-	 * @param stat - 변경할 상태 
+	 * @param stat    - 변경할 상태
 	 */
-	public void setRoomStat(int roomNum,int stat) {
-		String sql = "update room_info set room_state = "+stat+" where room_num=" + roomNum;
-		
+	public void setRoomStat(int roomNum, int stat) {
+		String sql = "update room_info set room_state = ? where room_num = ?";
+
 		try {
 			c.setAutoCommit(false);
 			// prepareStatement > 변수를 받을 수 있음
 			PreparedStatement ps = c.prepareStatement(sql);
-//			ps.setInt(1,roomNum );
-//			ps.setInt(2,stat );
+			ps.setInt(1, roomNum);
+			ps.setInt(2, stat);
 			int rs = ps.executeUpdate();
-			if (rs == 1) c.commit();
-			else c.rollback();
-		}catch(Exception e) {
+			if (rs == 1)
+				c.commit();
+			else
+				c.rollback();
+		} catch (Exception e) {
 			try {
 				c.rollback();
 			} catch (SQLException e1) {
-				
+
 			}
 		}
 	}
-	
+
 	/**
 	 * 고객정보를 로그DB에 추가합니다.
+	 * 
 	 * @param roomNum - 고객이 등록된 호텔 roomNum
 	 */
 	public void addCustomerLog(int roomNum) {
@@ -273,7 +268,7 @@ public class MainDao {
 			}
 			return;
 		}
-		
+
 		sql = "insert into customer_log values(null, ?, ?, ?, ?)";
 		try {
 			PreparedStatement ps = c.prepareStatement(sql);
@@ -299,7 +294,7 @@ public class MainDao {
 			return;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return [0]-room_num, [1]room_state, [2]cleaning_time
@@ -329,14 +324,14 @@ public class MainDao {
 		}
 		return rooms;
 	}
-	
+
 	public RoomStatEnum getRoom(String roomNum) {
-		String sql = "select room_state from room_info where room_num = " + roomNum;
+		String sql = "select room_state from room_info where room_num = ?";
 //		RoomStatEnum room = RoomStatEnum.STAYING;
 		try {
 			PreparedStatement ps = c.prepareStatement(sql);
-//			ps.setString(1, roomNum);
-			ResultSet rs = ps.executeQuery(sql);
+			ps.setString(1, roomNum);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				return RoomStatEnum.intToStatu(rs.getInt("room_state"));
 			}
@@ -352,5 +347,5 @@ public class MainDao {
 		}
 		return null;
 	}
-	
+
 }
