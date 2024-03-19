@@ -62,6 +62,11 @@
 
 </br>
 
+## 💾E-R Diagram
+![image](https://github.com/encore-full-stack-5/Hotel/assets/92596263/cdb44bcd-121a-4118-966a-3cb4340eb85d)
+
+</br>
+
 ## 💻역할 분담
 
 - CustomerMain / CustomerController / MainDao : 이진석
